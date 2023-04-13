@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { mountStoreDevtool } from "simple-zustand-devtools";
 
+export type BorderName = "top" | "bottom" | "left" | "right";
+
 export interface DraggingState {
   mutation?: DragMutation;
   setMutation: (mutation: DragMutation | undefined) => void;
@@ -9,7 +11,7 @@ export interface DraggingState {
 export interface DragMutation {
   sourceId: string;
   targetId: string;
-  targetCorner: "top" | "bottom" | "left" | "right";
+  targetBorder: BorderName;
 }
 
 export const useDragMutationStore = create<DraggingState>((set) => ({

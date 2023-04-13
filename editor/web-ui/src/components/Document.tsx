@@ -12,16 +12,29 @@ export default function Document() {
     "6th",
     "7th",
     "8th",
+    "9th",
+    "10th",
   ]);
 
   return (
     <div data-doc-root>
       <DragSupport>
-        {blocks.map((blockId) => (
-          <Block key={blockId} id={blockId}>
-            Hello {blockId}
-          </Block>
-        ))}
+        <div className="w-1/2 grid grid-cols-2">
+          <div>
+            {blocks.slice(0, 5).map((blockId) => (
+              <Block key={blockId} id={blockId}>
+                Hello {blockId}
+              </Block>
+            ))}
+          </div>
+          <div>
+            {blocks.slice(5).map((blockId) => (
+              <Block key={blockId} id={blockId}>
+                Hello {blockId}
+              </Block>
+            ))}
+          </div>
+        </div>
       </DragSupport>
     </div>
   );

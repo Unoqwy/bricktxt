@@ -1,6 +1,27 @@
 import { useEffect } from "react";
 import DragContainerProvider from "../context/DragContainerProvider";
-import { useDragMutationStore } from "../store/drag-mutation";
+import { BorderName, useDragMutationStore } from "../store/drag-mutation";
+
+type BorderId = 1 | 2 | 3 | 4;
+
+const BORDER_TOP: BorderId = 1;
+const BORDER_BOTTOM: BorderId = 2;
+const BORDER_LEFT: BorderId = 3;
+const BORDER_RIGHT: BorderId = 4;
+
+function convertBorder(id: BorderId): BorderName {
+  switch (id) {
+    case BORDER_TOP:
+      return "top";
+    case BORDER_BOTTOM:
+      return "bottom";
+    case BORDER_LEFT:
+      return "left";
+    case BORDER_RIGHT:
+      return "right";
+  }
+  throw new Error("Illegal argument: unexpected border ID");
+}
 
 export interface DragSupportProps {
   children: React.ReactNode;
@@ -42,24 +63,41 @@ export default function DragSupport(props: DragSupportProps) {
     }
     const posX = event.pageX,
       posY = event.pageY;
+    const points = [];
+    for (var i = 0; i < blocks.length; i++) {
+      const block = blocks[i];
+      const rect = block.getBoundingClientRect();
+      points.push({
+        x: rect.right - rect.width / 2,
+        y: rect.top,
+        border: BORDER_TOP,
+        block,
+      });
+      points.push({
+        x: rect.right - rect.width / 2,
+        y: rect.bottom,
+        border: BORDER_BOTTOM,
+        block,
+      });
+    }
     var curDist = -1,
       curNearest;
-    for (var i = 0; i < blocks.length; i++) {
-      const rect = blocks[i].getBoundingClientRect();
-      const distToBottom = Math.abs(posY - rect.bottom);
-      if (curDist === -1 || distToBottom < curDist) {
-        curNearest = blocks[i];
-        curDist = distToBottom;
+    for (var i = 0; i < points.length; i++) {
+      const point = points[i];
+      const dist = Math.abs(posX - point.x) + Math.abs(posY - point.y);
+      if (curDist === -1 || dist < curDist) {
+        curNearest = point;
+        curDist = dist;
       }
     }
     if (!curNearest) {
       return;
     }
-    const targetId = curNearest.getAttribute("data-block-id")!;
+    const targetId = curNearest.block.getAttribute("data-block-id")!;
     setMutation({
       sourceId,
       targetId,
-      targetCorner: "bottom",
+      targetBorder: convertBorder(curNearest.border),
     });
   }
 
