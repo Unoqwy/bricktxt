@@ -2,6 +2,8 @@
 
 Block-based document editor using YAML files as storage.
 
+Built with React (UI) and Rust (engine).
+
 ## Motivation
 
 Block-based text editing is very powerful and has proven its demand with the influx of tools like Notion.
