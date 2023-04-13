@@ -7,7 +7,7 @@ interface Block {
   /** Human-readable type identifier. */
   type: string;
   /** Schema to be used for this block. Looked up from 'type'. */
-  schema: BlockSchema | undefined,
+  schema: BlockSchema | undefined;
 }
 
 /**
@@ -23,7 +23,7 @@ interface BlockSchema {
    * Property paths that may contain values with content.
    * This is used for search purposes.
    */
-  contentProperties: string[],
+  contentProperties: string[];
 }
 
 export { Block, BlockSchema };

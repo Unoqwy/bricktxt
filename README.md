@@ -9,6 +9,10 @@ Built with React (UI) and Rust (engine).
 Block-based text editing is very powerful and has proven its demand with the influx of tools like Notion.
 However, if you care about privacy and want to do your editing locally while still maintaining text files that can be version-controlled and are future-proof, well, nothing offered you that.
 
+## What It Is
+
+bricktxt itself is a library written in Rust, that is used like a backend would on a web service: it links bricks together, provide search abilities, write changes to files, etc.
+
 ## Q&A
 
 ### Why store as YAML, and not HTML?
