@@ -1,0 +1,12 @@
+{
+  "name": "platform-api",
+  "version": "0.1.0",
+  "description": "bricktxt Editor Platform API",
+  "license": "MIT",
+  "source": "src/index.ts",
+  "main": "dist/main.js",
+  "types": "dist/types.d.ts",
+  "devDependencies": {
+    "parcel": "^2.8.3"
+  }
+}

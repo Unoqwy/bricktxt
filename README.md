@@ -1,6 +1,6 @@
 # bricktxt
 
-Block-based text editing tool using YAML files as storage.
+Block-based document editor using YAML files as storage.
 
 ## Motivation
 

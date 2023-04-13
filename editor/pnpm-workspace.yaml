@@ -1,0 +1,4 @@
+packages:
+- platform-api
+- platform-core
+- web-ui
