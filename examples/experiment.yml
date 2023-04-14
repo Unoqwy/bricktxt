@@ -1,0 +1,68 @@
+#<BRICKTXT+0.1>
+#<Root>
+#<Implementation-Name:Example>
+#<Implementation-Version:1.0>
+
+# BEGIN PAGE idNOCtEos "A title"
+element: page
+id: idNOCtEos
+title: "A title"
+description: "Block-based text editing stored as <b>YAML</b> files"
+content:
+- anotherid
+- imnotarng
+- dbviewid
+
+blocks:
+- id: anotherid
+  type: header-1
+  text: "Test"
+- id: imnotarng
+  type: paragraph
+  text: "Experimenting with formats to see what would work"
+- id: dbviewid
+  type: database-view
+  database-id: Z3JlZW5maW5l
+  views:
+  - view: calendar
+    date-property: day
+# END PAGE idNOCtEos "A title"
+---
+# BEGIN DATABASE Z3JlZW5maW5l "Journal"
+element: database
+id: Z3JlZW5maW5l
+title: "Journal"
+schema:
+  page-key: "content-page"
+  properties:
+  - key: day
+    type: date
+    name: "Date"
+  - key: sleep
+    type: time
+    name: "Sleep Time"
+  - key: motd
+    type: string
+    name: "MOTD"
+entries:
+- date: "13 Apr 2023"
+  motd: "Another Day"
+  content-page: b3R0cmVlb2Zm
+## BEGIN DATABASE EMBEDDED PAGES
+---
+### BEGIN EMBEDDED PAGE b3R0cmVlb2Zm "April 13th, 2023"
+element: page
+id: b3R0cmVlb2Zm
+title: "April 13th, 2023"
+content:
+- am9pbmNvcH
+
+blocks:
+- id: am9pbmNvcH
+  type: paragraph
+  text: "TODO : Summary of the day"
+### END EMBEDDED PAGE b3R0cmVlb2Zm "April 13th, 2023"
+
+## END DATABASE EMBEDDED PAGES
+
+# END DATABASE Z3JlZW5maW5l "Journal"
