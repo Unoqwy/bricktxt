@@ -1,6 +1,11 @@
-import { useEffect } from "react";
-import DragContainerProvider from "../context/DragContainerProvider";
-import { BorderName, useDragMutationStore } from "../store/drag-mutation";
+import { useEffect, useState } from "react";
+import {
+  DragContainerContext,
+  DragContainerOptions,
+  DragElement,
+  DragElementSupplier,
+} from "~/context/DragContainerProvider";
+import { BorderName, useDragMutationStore } from "~/store/drag-mutation";
 
 type BorderId = 1 | 2 | 3 | 4;
 
@@ -23,11 +28,17 @@ function convertBorder(id: BorderId): BorderName {
   throw new Error("Illegal argument: unexpected border ID");
 }
 
+interface DragState {
+  element: DragElement;
+  pageRoot: HTMLDivElement;
+}
+
 export interface DragSupportProps {
   children: React.ReactNode;
 }
 
 export default function DragSupport(props: DragSupportProps) {
+  const [dragState, setDragState] = useState<DragState | undefined>(undefined);
   const { mutation, setMutation } = useDragMutationStore();
 
   useEffect(() => {
@@ -38,26 +49,37 @@ export default function DragSupport(props: DragSupportProps) {
     };
   }, []);
 
-  function handleDragStart(event: React.DragEvent<HTMLDivElement>) {
-    const pageRoot = (event.target as HTMLDivElement).closest(
+  function handleDragStart(
+    event: React.DragEvent<HTMLDivElement>,
+    elementSupplier?: DragElementSupplier<HTMLDivElement>
+  ) {
+    const pageRoot = (event.target as HTMLDivElement).closest<HTMLDivElement>(
       "div[data-doc-root]"
     );
     if (!pageRoot) {
       event.preventDefault();
+      return;
     }
+    const element = elementSupplier?.(event);
+    const sourceId = element?.id;
+    if (!sourceId) {
+      event.preventDefault();
+      return;
+    }
+    if (element.displayElement) {
+      event.dataTransfer.setDragImage(element.displayElement, 0, 0);
+    }
+    setDragState({
+      element,
+      pageRoot,
+    });
   }
 
   function handleDragUpdate(event: React.DragEvent<HTMLDivElement>) {
-    const target = event.target as HTMLDivElement;
-    const sourceId = target.getAttribute("data-block-id");
-    if (sourceId == null) {
+    if (!dragState) {
       return;
     }
-    const pageRoot = target.closest("div[data-doc-root]");
-    if (!pageRoot) {
-      return;
-    }
-    const blocks = pageRoot.querySelectorAll("div[data-block-id]");
+    const blocks = dragState.pageRoot.querySelectorAll("div[data-block-id]");
     if (!blocks) {
       return;
     }
@@ -95,7 +117,7 @@ export default function DragSupport(props: DragSupportProps) {
     }
     const targetId = curNearest.block.getAttribute("data-block-id")!;
     setMutation({
-      sourceId,
+      sourceId: dragState.element.id,
       targetId,
       targetBorder: convertBorder(curNearest.border),
     });
@@ -106,14 +128,15 @@ export default function DragSupport(props: DragSupportProps) {
     setMutation(undefined);
   }
 
+  const dragOptions: DragContainerOptions<HTMLDivElement> = {
+    onDragStart: handleDragStart,
+    onDragUpdate: handleDragUpdate,
+    onDragEnd: handleDragEnd,
+  };
   return (
-    <DragContainerProvider
-      onDragStart={handleDragStart}
-      onDragUpdate={handleDragUpdate}
-      onDragEnd={handleDragEnd}
-    >
+    <DragContainerContext.Provider value={dragOptions}>
       {props.children}
-    </DragContainerProvider>
+    </DragContainerContext.Provider>
   );
 }
 

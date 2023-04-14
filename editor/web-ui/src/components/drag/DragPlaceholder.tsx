@@ -1,11 +1,11 @@
 import { CSSProperties } from "react";
-import { BorderName, useDragMutationStore } from "../store/drag-mutation";
+import { BorderName, useDragMutationStore } from "~/store/drag-mutation";
 
-export interface DragHintProps {
+export interface DragPlaceholderProps {
   blockId: string;
 }
 
-export function DragHint(props: DragHintProps) {
+export function DragPlaceholder(props: DragPlaceholderProps) {
   const { mutation } = useDragMutationStore();
 
   if (mutation?.targetId !== props.blockId) {

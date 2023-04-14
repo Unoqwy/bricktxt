@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Block from "./Block";
-import DragSupport from "./DragSupport";
+import DragSupport from "~/components/drag/DragSupport";
 
 export default function Document() {
   const [blocks, setBlocks] = useState(() => [
@@ -17,7 +17,7 @@ export default function Document() {
   ]);
 
   return (
-    <div data-doc-root>
+    <div data-doc-root className="mt-8 flex justify-center">
       <DragSupport>
         <div className="w-1/2 grid grid-cols-2">
           <div>

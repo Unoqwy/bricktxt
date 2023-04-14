@@ -1,9 +1,21 @@
 import { DOMAttributes, createContext, useContext } from "react";
 
-export interface DragContainerOptions {
-  onDragStart?: React.DragEventHandler;
-  onDragUpdate?: React.DragEventHandler;
-  onDragEnd?: React.DragEventHandler;
+export interface DragElement {
+  id: string;
+  displayElement?: HTMLElement;
+}
+
+export type DragElementSupplier<T = any> = (
+  event: React.DragEvent<T>
+) => DragElement;
+
+export interface DragContainerOptions<T = any> {
+  onDragStart?: (
+    event: React.DragEvent<T>,
+    elementSupplier?: DragElementSupplier<T>
+  ) => void;
+  onDragUpdate?: React.DragEventHandler<T>;
+  onDragEnd?: React.DragEventHandler<T>;
 }
 
 export const DragContainerContext = createContext<
@@ -18,26 +30,16 @@ export function useDragContainer(): DragContainerOptions {
   return opt;
 }
 
-export function useDraggableProps(): DOMAttributes<unknown> {
+export function useDraggableProps<T extends Element>(
+  elementSupplier?: DragElementSupplier
+): DOMAttributes<T> {
   const opt = useDragContainer();
   return {
-    onDragStart: opt.onDragStart,
+    onDragStart:
+      opt.onDragStart !== undefined
+        ? (event) => opt.onDragStart!(event, elementSupplier)
+        : undefined,
     onDrag: opt.onDragUpdate,
     onDragEnd: opt.onDragEnd,
   };
-}
-
-export interface DragContainerProviderProps extends DragContainerOptions {
-  children: React.ReactNode;
-}
-
-export default function DragContainerProvider({
-  children,
-  ...state
-}: DragContainerProviderProps) {
-  return (
-    <DragContainerContext.Provider value={state}>
-      {children}
-    </DragContainerContext.Provider>
-  );
 }
