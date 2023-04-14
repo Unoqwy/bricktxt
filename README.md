@@ -1,6 +1,6 @@
 # bricktxt
 
-Block-based document editor using YAML files as storage.
+Block-based document editor using TOML files as storage.
 
 Built with React (UI) and Rust (engine).
 
@@ -15,8 +15,9 @@ bricktxt itself is a library written in Rust, that is used like a backend would 
 
 ## Q&A
 
-### Why store as YAML, and not HTML?
+### Why use TOML?
 
-It's easy to think that with HTML, files could be opened directly decades later without the need to use convert the format first.
-The truth is, while you could very well represent block-based text files using a markup language, any remotely complex block that needs to be evaluated dynamically would not display all the content. This is obviously a deal-breaker for things like databases.
-With this shortcomings in mind, any file format can be used. YAML was picked because it's (relatively) user-friendly and can represent a lot of data in a concise manner.
+Before landing on TOML, there were other considerations:
+
+- HTML: This would have been a great option for future-proofing if blocks remained basics. Blocks are not all simple though. Considering the needs to have dynamic evaluation, several documents within the same file, a clean way to store arbitrary data, and as little parsing overhead as possible, HTML doesn't work at all for this use case.
+- YAML: The format supports several documents in the same file, is (relatively) user-friendly and is space-efficient. So, what's wrong? It wouldn't have been a bad choice, but after experimenting with how files would look and comparing TOML to YAML, TOML was the clear winner. Although users shouldn't need to edit files manually, it leads to nicer diff with version control. Using TOML also has some techincal benefits for the engine to use.
