@@ -5,6 +5,7 @@ import {
   DragElement,
   DragElementSupplier,
 } from "~/context/DragContainerProvider";
+import { useDocumentStore } from "~/store/document";
 import { Border, useDragMutationStore } from "~/store/drag-mutation";
 
 interface DragState {
@@ -19,6 +20,7 @@ export interface DragSupportProps {
 export default function DragSupport(props: DragSupportProps) {
   const [dragState, setDragState] = useState<DragState | undefined>(undefined);
   const { mutation, setMutation } = useDragMutationStore();
+  const { applyDragMutation } = useDocumentStore();
 
   useEffect(() => {
     document.addEventListener("dragover", handleGlobalDragOver);
@@ -103,8 +105,10 @@ export default function DragSupport(props: DragSupportProps) {
   }
 
   function handleDragEnd() {
-    console.log(mutation);
     setMutation(undefined);
+    if (mutation) {
+      applyDragMutation(mutation);
+    }
   }
 
   const dragOptions: DragContainerOptions<HTMLDivElement> = {

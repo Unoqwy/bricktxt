@@ -1,38 +1,31 @@
-import { useState } from "react";
 import Block from "./Block";
 import DragSupport from "~/components/drag/DragSupport";
+import { useDocumentStore } from "~/store/document";
 
 export default function Document() {
-  const [blocks, setBlocks] = useState(() => [
-    "1st",
-    "2nd",
-    "3rd",
-    "4th",
-    "5th",
-    "6th",
-    "7th",
-    "8th",
-    "9th",
-    "10th",
-  ]);
+  const blocks = useDocumentStore((state) => state.content);
 
   return (
     <div data-doc-root className="mt-8 flex justify-center">
       <DragSupport>
         <div className="w-1/2 grid grid-cols-2">
           <div>
-            {blocks.slice(0, 5).map((blockId) => (
-              <Block key={blockId} id={blockId}>
-                Hello {blockId}
-              </Block>
-            ))}
+            {blocks
+              .filter((block) => block.type === "paragraph")
+              .map((block) => (
+                <Block key={block.id} id={block.id}>
+                  {block.text}
+                </Block>
+              ))}
           </div>
           <div>
-            {blocks.slice(5).map((blockId) => (
-              <Block key={blockId} id={blockId}>
-                Hello {blockId}
-              </Block>
-            ))}
+            {blocks
+              .filter((block) => block.type === "paragraph-2")
+              .map((block) => (
+                <Block key={block.id} id={block.id}>
+                  {block.text}
+                </Block>
+              ))}
           </div>
         </div>
       </DragSupport>
