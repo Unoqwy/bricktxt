@@ -5,28 +5,7 @@ import {
   DragElement,
   DragElementSupplier,
 } from "~/context/DragContainerProvider";
-import { BorderName, useDragMutationStore } from "~/store/drag-mutation";
-
-type BorderId = 1 | 2 | 3 | 4;
-
-const BORDER_TOP: BorderId = 1;
-const BORDER_BOTTOM: BorderId = 2;
-const BORDER_LEFT: BorderId = 3;
-const BORDER_RIGHT: BorderId = 4;
-
-function convertBorder(id: BorderId): BorderName {
-  switch (id) {
-    case BORDER_TOP:
-      return "top";
-    case BORDER_BOTTOM:
-      return "bottom";
-    case BORDER_LEFT:
-      return "left";
-    case BORDER_RIGHT:
-      return "right";
-  }
-  throw new Error("Illegal argument: unexpected border ID");
-}
+import { Border, useDragMutationStore } from "~/store/drag-mutation";
 
 interface DragState {
   element: DragElement;
@@ -92,13 +71,13 @@ export default function DragSupport(props: DragSupportProps) {
       points.push({
         x: rect.right - rect.width / 2,
         y: rect.top,
-        border: BORDER_TOP,
+        border: Border.Top,
         block,
       });
       points.push({
         x: rect.right - rect.width / 2,
         y: rect.bottom,
-        border: BORDER_BOTTOM,
+        border: Border.Bottom,
         block,
       });
     }
@@ -119,7 +98,7 @@ export default function DragSupport(props: DragSupportProps) {
     setMutation({
       sourceId: dragState.element.id,
       targetId,
-      targetBorder: convertBorder(curNearest.border),
+      targetBorder: curNearest.border,
     });
   }
 

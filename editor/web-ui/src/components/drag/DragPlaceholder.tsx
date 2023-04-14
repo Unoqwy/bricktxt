@@ -1,5 +1,5 @@
 import { CSSProperties } from "react";
-import { BorderName, useDragMutationStore } from "~/store/drag-mutation";
+import { Border, BorderId, useDragMutationStore } from "~/store/drag-mutation";
 
 export interface DragPlaceholderProps {
   blockId: string;
@@ -24,31 +24,32 @@ export function DragPlaceholder(props: DragPlaceholderProps) {
   );
 }
 
-function getRectStyle(border: BorderName): CSSProperties {
+function getRectStyle(border: BorderId): CSSProperties {
   switch (border) {
-    case "top":
+    case Border.Top:
       return {
         width: "100%",
         height: "3px",
         top: "-2px",
       };
-    case "bottom":
+    case Border.Bottom:
       return {
         width: "100%",
         height: "3px",
         bottom: "-2px",
       };
-    case "left":
+    case Border.Left:
       return {
         height: "100%",
         width: "3px",
         left: "-2px",
       };
-    case "right":
+    case Border.Right:
       return {
         height: "100%",
         width: "3px",
         right: "-2px",
       };
   }
+  throw new Error("Illegal argument: 'border' is an unknown ID");
 }

@@ -25,7 +25,7 @@ export function BlockActions(props: BlockActionsProps) {
       ref={containerRef}
       className={classNames(
         styles.block_actions,
-        "flex gap-1 justify-end items-center"
+        "mt-0.5 flex gap-1 justify-end items-center"
       )}
     >
       <button>
