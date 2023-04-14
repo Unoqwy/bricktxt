@@ -23,9 +23,7 @@ export default function DragSupport(props: DragSupportProps) {
   const { applyDragMutation } = useDocumentStore();
 
   useEffect(() => {
-    document.addEventListener("dragover", handleGlobalDragOver);
     return () => {
-      document.removeEventListener("dragover", handleGlobalDragOver);
       setMutation(undefined);
     };
   }, []);
@@ -66,6 +64,9 @@ export default function DragSupport(props: DragSupportProps) {
     }
     const posX = event.pageX,
       posY = event.pageY;
+    if (posX === 0 && posY === 0) {
+      return;
+    }
     const points = [];
     for (var i = 0; i < blocks.length; i++) {
       const block = blocks[i];
@@ -121,9 +122,4 @@ export default function DragSupport(props: DragSupportProps) {
       {props.children}
     </DragContainerContext.Provider>
   );
-}
-
-// hack to avoid getting a (0,0) reset DragUpdate just before end
-function handleGlobalDragOver(event: DragEvent) {
-  event?.preventDefault();
 }

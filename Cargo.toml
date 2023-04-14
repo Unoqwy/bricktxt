@@ -1,4 +1,8 @@
 [workspace]
 members = [
-  "engine"
+  "engine/core",
+  "engine/web-wasm"
 ]
+
+[profile.release.package.bricktxt-web-wasm]
+opt-level = "s"

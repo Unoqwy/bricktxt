@@ -10,22 +10,11 @@ export default function Document() {
       <DragSupport>
         <div className="w-1/2 grid grid-cols-2">
           <div>
-            {blocks
-              .filter((block) => block.type === "paragraph")
-              .map((block) => (
-                <Block key={block.id} id={block.id}>
-                  {block.text}
-                </Block>
-              ))}
-          </div>
-          <div>
-            {blocks
-              .filter((block) => block.type === "paragraph-2")
-              .map((block) => (
-                <Block key={block.id} id={block.id}>
-                  {block.text}
-                </Block>
-              ))}
+            {blocks.map((block) => (
+              <Block key={block.id} id={block.id}>
+                {block.text}
+              </Block>
+            ))}
           </div>
         </div>
       </DragSupport>
