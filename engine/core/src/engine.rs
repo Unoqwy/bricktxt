@@ -192,4 +192,8 @@ impl Registry {
     pub fn get_block(&self, id: &InternalId) -> Option<&Block> {
         self.blocks.get(id)
     }
+
+    pub fn get_block_mut(&mut self, id: &InternalId) -> Option<&mut Block> {
+        self.blocks.get_mut(id)
+    }
 }

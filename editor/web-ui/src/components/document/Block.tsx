@@ -13,7 +13,7 @@ export default function Block(props: BlockProps) {
   const ref = useRef(null);
   const content = useMemo(
     () => (
-      <div ref={ref} className="ml-2 outline-none" contentEditable={true}>
+      <div ref={ref} className="w-full">
         {props.children}
       </div>
     ),
@@ -27,7 +27,7 @@ export default function Block(props: BlockProps) {
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
-      <div className="absolute left-[-50px] w-[50px] h-full">
+      <div className="absolute left-[-50px] w-[50px] h-full pr-2">
         {showActions && <BlockActions blockId={props.id} contentRef={ref} />}
       </div>
       {content}

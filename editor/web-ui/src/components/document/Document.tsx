@@ -1,6 +1,7 @@
 import Block from "./Block";
 import DragSupport from "~/components/drag/DragSupport";
 import { useDocumentStore } from "~/store/document";
+import TextBlock from "../block/TextBlock";
 
 export default function Document() {
   const blocks = useDocumentStore((state) => state.content);
@@ -12,7 +13,7 @@ export default function Document() {
           <div>
             {blocks.map((block) => (
               <Block key={block.id} id={block.id}>
-                {block.text}
+                <TextBlock blockId={block.id} text={block.text} />
               </Block>
             ))}
           </div>

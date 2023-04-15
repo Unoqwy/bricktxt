@@ -1,0 +1,9 @@
+.content {
+  width: 100%;
+  outline: none;
+}
+
+.content:empty:focus::after {
+  content: attr(data-empty-placeholder);
+  opacity: .5;
+}

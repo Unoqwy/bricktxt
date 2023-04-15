@@ -8,3 +8,4 @@ publish = false
 bricktxt-core = { path = "../core" }
 
 serde = { version = "1.0.160", features = ["derive"] }
+toml = "0.7.3"

@@ -19,3 +19,11 @@ pub enum RelativePosition {
     Top,
     Bottom,
 }
+
+/// A request to update a block property.
+#[derive(Clone, Deserialize)]
+pub struct UpdateBlockPropertyCommand {
+    pub block_id: String,
+    pub property: String,
+    pub value: toml::Value,
+}

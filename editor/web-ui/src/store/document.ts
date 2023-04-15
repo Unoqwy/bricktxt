@@ -36,8 +36,8 @@ export const useDocumentStore = create<DocumentStore>((set, get) => ({
       target_id: mutation.targetId,
       position: mutation.targetBorder === Border.Top ? "Top" : "Bottom",
     };
-    backend().cmd_reposition(command);
-    set({ content: backend().get_content() });
+    backend.instance.cmd_reposition(command);
+    set({ content: backend.instance.get_content() });
   },
 }));
 

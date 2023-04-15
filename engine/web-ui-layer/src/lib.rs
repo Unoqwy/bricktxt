@@ -1,10 +1,17 @@
 pub mod datatypes;
 
 use bricktxt_core::engine::Engine;
-use datatypes::{Block, RelativePosition, RepositionCommand};
+use datatypes::{Block, RelativePosition, RepositionCommand, UpdateBlockPropertyCommand};
 
 pub struct Backend {
     engine: Engine,
+}
+
+impl Backend {
+    pub fn init() -> Self {
+        let engine = Engine::init();
+        Self { engine }
+    }
 }
 
 impl Backend {
@@ -47,9 +54,13 @@ impl Backend {
                     })
             })
     }
-}
 
-pub fn init_backend() -> Backend {
-    let engine = Engine::init();
-    Backend { engine }
+    #[inline]
+    pub fn cmd_update_block_property(&mut self, command: UpdateBlockPropertyCommand) {
+        let block = match self.engine.registry.get_block_mut(&command.block_id) {
+            Some(block) => block,
+            None => return,
+        };
+        block.properties.insert(command.property, command.value);
+    }
 }

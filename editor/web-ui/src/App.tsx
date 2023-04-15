@@ -8,7 +8,7 @@ export default function App() {
   const setContent = useDocumentStore((state) => state.setContent);
 
   useEffect(() => {
-    setContent(backend().get_content());
+    setContent(backend.instance.get_content());
   }, []);
 
   return <Document />;

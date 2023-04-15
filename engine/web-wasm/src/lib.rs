@@ -1,4 +1,4 @@
-use bricktxt_web_ui_layer::{init_backend, Backend};
+use bricktxt_web_ui_layer::Backend;
 use serde_wasm_bindgen::from_value as from_js;
 use wasm_bindgen::prelude::*;
 
@@ -14,7 +14,7 @@ pub fn init() -> WebAssemblyBackend {
     console_error_panic_hook::set_once();
 
     log("WASM backend init");
-    WebAssemblyBackend(init_backend())
+    WebAssemblyBackend(Backend::init())
 }
 
 #[wasm_bindgen]
@@ -31,6 +31,15 @@ impl WebAssemblyBackend {
     #[wasm_bindgen]
     pub fn cmd_reposition(&mut self, command: JsValue) -> Result<(), serde_wasm_bindgen::Error> {
         self.0.cmd_reposition(from_js(command)?);
+        Ok(())
+    }
+
+    #[wasm_bindgen]
+    pub fn cmd_update_block_property(
+        &mut self,
+        command: JsValue,
+    ) -> Result<(), serde_wasm_bindgen::Error> {
+        self.0.cmd_update_block_property(from_js(command)?);
         Ok(())
     }
 }
