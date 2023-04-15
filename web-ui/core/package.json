@@ -1,0 +1,13 @@
+{
+  "name": "bricktxt-core",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "dependencies": {
+    "bricktxt-backend-api": "workspace:^"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.3"
+  }
+}

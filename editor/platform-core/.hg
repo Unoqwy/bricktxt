@@ -1,4 +1,0 @@
-Not Mercurial. This file is a hack to get parcel to use this directory as root over the workspace.
-
-See https://github.com/parcel-bundler/parcel/issues/7063,
-and https://github.com/parcel-bundler/parcel/blob/4fb6cd9abeced4db6fad1ba7bb9d67848f61b7d5/packages/core/core/src/resolveOptions.js#L72.

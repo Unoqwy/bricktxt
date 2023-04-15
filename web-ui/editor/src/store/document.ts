@@ -3,16 +3,13 @@
  * without the engine. This is not how documents will actually be handled.
  */
 
+import { backend } from "bricktxt-core";
+
 import { create } from "zustand";
 import { mountStoreDevtool } from "simple-zustand-devtools";
 import { Border, DragMutation } from "./drag-mutation";
-import backend from "~/backend";
 
-export interface Block {
-  id: string;
-  type: string;
-  text: string;
-}
+import { Block } from "bricktxt-backend-api";
 
 export interface DocumentStore {
   content: Block[];

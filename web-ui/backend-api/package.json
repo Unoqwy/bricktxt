@@ -1,0 +1,10 @@
+{
+  "name": "bricktxt-backend-api",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "devDependencies": {
+    "typescript": "^4.9.3"
+  }
+}

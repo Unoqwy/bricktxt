@@ -1,4 +1,4 @@
-import backend from "~/backend";
+import { backend } from "bricktxt-core";
 import styles from "./TextBlock.module.css";
 import { useRef, useState } from "react";
 import ContentEditable from "react-contenteditable";
@@ -24,7 +24,11 @@ export default function TextBlock(props: TextBlockProps) {
         html={content.current}
         onChange={(event) => {
           content.current = event.target.value;
-          backend.updateBlockProperty(props.blockId, "text", content.current);
+          backend.cmd.updateBlockProperty(
+            props.blockId,
+            "text",
+            content.current
+          );
         }}
         onKeyDown={(event) => {
           if (event.key === "/") {
