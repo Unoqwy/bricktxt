@@ -2,10 +2,18 @@ import { Block } from "~/store/document";
 
 import { init } from "bricktxt-web-wasm";
 
+interface RepositionCommand {
+  source_id: string;
+  target_id: string;
+  position: string;
+}
+
 var instance: Backend | undefined;
 
 export interface Backend {
   get_content(): Block[];
+
+  cmd_reposition(command: RepositionCommand): void;
 }
 
 export function initWebBackend() {

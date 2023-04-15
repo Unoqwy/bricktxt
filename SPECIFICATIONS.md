@@ -6,7 +6,7 @@ IMPORTANT NOTE: Work In Progress
 
 ## Top-level elements
 
-Everything in bricktxt is represented in three categories:
+Everything in bricktxt is represented as three distinct element types:
 
 - **Documents**<br/>
   A document (aka. page) is a set of blocks -with metadata- intended to be viewed fully, whether on its own or embedded.
@@ -17,3 +17,5 @@ Everything in bricktxt is represented in three categories:
   A database is a set of records that is used as an advanced data storage. Each database can define its own schema, that records follow.
 
 TODO : TOML representation
+
+TODO : Identifier Format
