@@ -3,8 +3,8 @@
 #<Implementation-Name:Example>
 #<Implementation-Version:1.0>
 
-# BEGIN PAGE idNOCtEos "A title"
-[page.idNOCtEos]
+# BEGIN DOCUMENT idNOCtEos "A title"
+[document.idNOCtEos]
 title = "A title"
 description = "Block-based text editing stored as <b>TOML</b> files"
 content = [
@@ -28,31 +28,31 @@ database-id = "Z3JlZW5maW5l"
 [[block.dbviewid.views]]
 view = "calendar"
 date-property = "day"
-# END PAGE idNOCtEos "A title"
+# END DOCUMENT idNOCtEos "A title"
 
 # BEGIN DATABASE Z3JlZW5maW5l "Journal"
 [database.Z3JlZW5maW5l]
 title = "Journal"
 
 [database.Z3JlZW5maW5l.schema]
-page-key = "content-page"
 properties = [
   { key = "day", type = "date", name = "Date" },
   { key = "sleep", type = "time", name = "Sleep Time" },
   { key = "motd", type = "string", name = "MOTD" },
+  { key = "content-page", type = "document", name = "Content" }
 ]
 
-## BEGIN DATABASE ENTRIES
-[[database.Z3JlZW5maW5l.entries]]
+## BEGIN DATABASE RECORDS
+[[database.Z3JlZW5maW5l.records]]
 day = 2023-04-13
 motd = "Another Day"
 content-page = "b3R0cmVlb2Zm"
-## END DATABASE ENTRIES
+## END DATABASE RECORDS
 
 ## BEGIN DATABASE EMBEDDED PAGES
 
 ### BEGIN EMBEDDED PAGE b3R0cmVlb2Zm "April 13th, 2023"
-[page.b3R0cmVlb2Zm]
+[document.b3R0cmVlb2Zm]
 title = "April 13th, 2023"
 content = [
   "am9pbmNvcH"
