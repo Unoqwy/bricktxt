@@ -1,0 +1,10 @@
+[package]
+name = "bricktxt-web-ui-layer"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+bricktxt-core = { path = "../core" }
+
+serde = { version = "1.0.160", features = ["derive"] }

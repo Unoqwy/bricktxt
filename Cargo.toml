@@ -1,6 +1,7 @@
 [workspace]
 members = [
   "engine/core",
+  "engine/web-ui-layer",
   "engine/web-wasm"
 ]
 
