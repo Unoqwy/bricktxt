@@ -1,6 +1,7 @@
 use std::collections::hash_map::Values;
 use std::collections::HashMap;
 
+use crate::editor::Editor;
 use crate::rand::randid;
 
 pub type ExposedId = String;
@@ -23,7 +24,7 @@ pub struct Document {
     pub metadata: HashMap<String, toml::Value>,
 
     /// Whether the document needs to be saved.
-    _dirty: bool,
+    pub _dirty: bool,
 }
 
 /// A block element.
@@ -38,11 +39,11 @@ pub struct Block {
     /// Optional parent.
     pub _parent: Option<InternalId>,
     /// Whether the block needs to be saved.
-    _dirty: bool,
+    pub _dirty: bool,
 }
 
 pub struct Engine {
-    pub registry: Registry,
+    pub editor: Editor,
 }
 
 impl Engine {
@@ -78,72 +79,8 @@ impl Engine {
         };
         registry.add_document(doc);
 
-        Engine { registry }
-    }
-}
-
-impl Engine {
-    /// Safely edit a block and its parent.
-    pub fn edit_block_and_parent<F>(&mut self, id: &InternalId, f: F) -> bool
-    where
-        F: FnOnce(&mut Block, Option<&mut Document>) -> (bool, bool),
-    {
-        match self.registry.blocks.get_mut(id) {
-            Some(block) => {
-                let mut parent = block
-                    ._parent
-                    .as_ref()
-                    .and_then(|doc_id| self.registry.documents.get_mut(doc_id));
-                let (block_edited, parent_edited) = f(block, parent.as_deref_mut());
-                if block_edited {
-                    block._dirty = true;
-                }
-                match parent {
-                    Some(doc) if parent_edited => {
-                        doc._dirty = true;
-                    }
-                    _ => {}
-                }
-                true
-            }
-            None => false,
-        }
-    }
-
-    /// Changes a block's parent, removing it from previous one and adding it to the new one (if any).
-    pub fn reparent_block<F>(
-        &mut self,
-        block_id: &InternalId,
-        new_parent: Option<&InternalId>,
-        f: F,
-    ) where
-        F: FnOnce(&Document) -> Option<usize>,
-    {
-        let block = match self.registry.blocks.get_mut(block_id) {
-            Some(block) => block,
-            None => return,
-        };
-        let parent = block
-            ._parent
-            .as_ref()
-            .and_then(|doc_id| self.registry.documents.get_mut(doc_id));
-        if let Some(parent) = parent {
-            let index = parent.content.iter().position(|child| block.id.eq(child));
-            if let Some(index) = index {
-                parent.content.remove(index);
-                parent._dirty = true;
-            }
-        }
-        let new_parent = new_parent.and_then(|doc_id| self.registry.documents.get_mut(doc_id));
-        block._parent = new_parent.as_ref().map(|doc| doc.id.clone());
-        block._dirty = true;
-        if let Some(new_parent) = new_parent {
-            let index = f(new_parent).filter(|&index| index < new_parent.content.len());
-            match index {
-                Some(index) => new_parent.content.insert(index, block_id.clone()),
-                None => new_parent.content.push(block_id.clone()),
-            }
-            new_parent._dirty = true;
+        Engine {
+            editor: Editor::new(registry),
         }
     }
 }
@@ -161,8 +98,8 @@ impl Document {
 }
 
 pub struct Registry {
-    documents: HashMap<InternalId, Document>,
-    blocks: HashMap<InternalId, Block>,
+    pub documents: HashMap<InternalId, Document>,
+    pub blocks: HashMap<InternalId, Block>,
 }
 
 impl Registry {
@@ -173,11 +110,11 @@ impl Registry {
         }
     }
 
-    fn add_document(&mut self, document: Document) {
+    pub fn add_document(&mut self, document: Document) {
         self.documents.insert(document.id.clone(), document);
     }
 
-    fn add_block(&mut self, block: Block) {
+    pub fn add_block(&mut self, block: Block) {
         self.blocks.insert(block.id.clone(), block);
     }
 

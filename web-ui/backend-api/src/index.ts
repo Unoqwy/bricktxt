@@ -1,12 +1,21 @@
-import { RepositionCommand, UpdateBlockPropertyCommand } from "./commands";
+import {
+  BlockCreateCommand,
+  BlockDeleteCommand,
+  BlockRepositionCommand,
+  BlockUpdatePropertyCommand,
+} from "./commands";
 import { Block } from "./document";
 
 export interface Backend {
   get_content(): Block[];
 
-  cmd_reposition(command: RepositionCommand): void;
+  cmd_block_create(command: BlockCreateCommand): void;
 
-  cmd_update_block_property(command: UpdateBlockPropertyCommand): void;
+  cmd_block_delete(command: BlockDeleteCommand): void;
+
+  cmd_block_reposition(command: BlockRepositionCommand): void;
+
+  cmd_block_update_property(command: BlockUpdatePropertyCommand): void;
 }
 
 export * from "./document";

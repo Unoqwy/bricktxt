@@ -1,6 +1,23 @@
 use bricktxt_web_ui_layer::Backend;
-use serde_wasm_bindgen::from_value as from_js;
 use wasm_bindgen::prelude::*;
+
+macro_rules! impl_cmd_mirror {
+  ($backend:ty; $($cmd:ident),*) => {
+    #[wasm_bindgen]
+    impl $backend {
+      $(
+        pub fn $cmd(
+          &mut self,
+          command: JsValue
+        ) -> Result<(), serde_wasm_bindgen::Error>
+        {
+          self.0.$cmd(serde_wasm_bindgen::from_value(command)?);
+          Ok(())
+        }
+      )*
+    }
+  };
+}
 
 #[wasm_bindgen]
 extern "C" {
@@ -22,24 +39,16 @@ pub struct WebAssemblyBackend(Backend);
 
 #[wasm_bindgen]
 impl WebAssemblyBackend {
-    #[wasm_bindgen]
     pub fn get_content(&mut self) -> JsValue {
         let content = self.0.get_content();
         serde_wasm_bindgen::to_value(&content).unwrap()
     }
-
-    #[wasm_bindgen]
-    pub fn cmd_reposition(&mut self, command: JsValue) -> Result<(), serde_wasm_bindgen::Error> {
-        self.0.cmd_reposition(from_js(command)?);
-        Ok(())
-    }
-
-    #[wasm_bindgen]
-    pub fn cmd_update_block_property(
-        &mut self,
-        command: JsValue,
-    ) -> Result<(), serde_wasm_bindgen::Error> {
-        self.0.cmd_update_block_property(from_js(command)?);
-        Ok(())
-    }
 }
+
+impl_cmd_mirror!(
+    WebAssemblyBackend;
+    cmd_block_create,
+    cmd_block_delete,
+    cmd_block_reposition,
+    cmd_block_update_property
+);

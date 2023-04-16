@@ -3,6 +3,7 @@ import styles from "./TextBlock.module.css";
 import { useRef, useState } from "react";
 import ContentEditable from "react-contenteditable";
 import FloatOverlay from "~/FloatOverlay";
+import { useDocumentStore } from "~/store/document";
 
 export interface TextBlockProps {
   blockId: string;
@@ -14,6 +15,7 @@ export default function TextBlock(props: TextBlockProps) {
   const contentInnerRef = useRef<HTMLDivElement>(null);
 
   const [slashActions, setSlashActions] = useState(false);
+  const { setContent: setDocument } = useDocumentStore();
 
   return (
     <>
@@ -34,6 +36,20 @@ export default function TextBlock(props: TextBlockProps) {
           if (event.key === "/") {
             event.preventDefault();
             setSlashActions(true);
+          } else if (event.key === "Enter") {
+            event.preventDefault();
+            backend.cmd.createBlock("default", {
+              rel_block_id: props.blockId,
+              position: "Bottom",
+            });
+            setDocument(backend.instance.get_content());
+          } else if (
+            event.key === "Backspace" &&
+            content.current.length === 0
+          ) {
+            event.preventDefault();
+            backend.cmd.deleteBlock(props.blockId);
+            setDocument(backend.instance.get_content());
           }
         }}
       />

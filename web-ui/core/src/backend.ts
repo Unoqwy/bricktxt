@@ -1,4 +1,4 @@
-import { Backend } from "bricktxt-backend-api";
+import { Backend, BlockPlacement } from "bricktxt-backend-api";
 
 class BackendWrapper {
   /**
@@ -44,8 +44,28 @@ class BackendWrapperCommands {
     this.backend = backend;
   }
 
+  public createBlock(type: string, placement: BlockPlacement) {
+    this.backend.instance.cmd_block_create({
+      type,
+      placement,
+    });
+  }
+
+  public deleteBlock(id: string) {
+    this.backend.instance.cmd_block_delete({
+      block_id: id,
+    });
+  }
+
+  public repositionBlock(id: string, placement: BlockPlacement) {
+    this.backend.instance.cmd_block_reposition({
+      block_id: id,
+      placement,
+    });
+  }
+
   public updateBlockProperty(id: string, property: string, value: any) {
-    this.backend.instance.cmd_update_block_property({
+    this.backend.instance.cmd_block_update_property({
       block_id: id,
       property,
       value,

@@ -1,28 +1,28 @@
 //! Data types passed from the UI to the engine.
 
+use bricktxt_core::editor::placement::BlockPlacement;
 use serde::Deserialize;
 
-/// A request to reposition a block (source) relative to
-/// another one (target).
 #[derive(Clone, Deserialize)]
-pub struct RepositionCommand {
-    /// Source block ID.
-    pub source_id: String,
-    /// Target block ID.
-    pub target_id: String,
-    /// Relative position to the target block.
-    pub position: RelativePosition,
+pub struct BlockCreateCommand {
+    #[serde(rename = "type")]
+    pub ty: String,
+    pub placement: BlockPlacement,
 }
 
 #[derive(Clone, Deserialize)]
-pub enum RelativePosition {
-    Top,
-    Bottom,
+pub struct BlockDeleteCommand {
+    pub block_id: String,
 }
 
-/// A request to update a block property.
 #[derive(Clone, Deserialize)]
-pub struct UpdateBlockPropertyCommand {
+pub struct BlockRepositionCommand {
+    pub block_id: String,
+    pub placement: BlockPlacement,
+}
+
+#[derive(Clone, Deserialize)]
+pub struct BlockUpdatePropertyCommand {
     pub block_id: String,
     pub property: String,
     pub value: toml::Value,
