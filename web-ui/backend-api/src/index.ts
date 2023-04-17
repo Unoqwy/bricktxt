@@ -1,13 +1,17 @@
+import { Document } from "./document";
 import {
   BlockCreateCommand,
   BlockDeleteCommand,
   BlockRepositionCommand,
   BlockUpdatePropertyCommand,
 } from "./commands";
-import { Block } from "./document";
 
 export interface Backend {
-  get_content(): Block[];
+  view_create(initial_doc_id: string): number;
+
+  view_free(view_id: number): void;
+
+  view_get_content(view_id: number): Document;
 
   cmd_block_create(command: BlockCreateCommand): void;
 

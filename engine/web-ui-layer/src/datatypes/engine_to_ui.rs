@@ -12,6 +12,13 @@
 use serde::Serialize;
 
 #[derive(Clone, Serialize)]
+pub struct Document<'ui> {
+    pub id: &'ui str,
+    pub title: &'ui str,
+    pub content: Vec<Block<'ui>>,
+}
+
+#[derive(Clone, Serialize)]
 pub struct Block<'ui> {
     pub id: &'ui str,
     #[serde(rename = "type")]

@@ -5,10 +5,8 @@ import {
   DragElement,
   DragElementSupplier,
 } from "~/context/DragContainerProvider";
-import { useDocumentStore } from "~/store/document";
 import { Border, useDragMutationStore } from "~/store/drag-mutation";
-
-import { backend } from "bricktxt-core";
+import useActiveView from "~/hooks/useActiveView";
 
 interface DragState {
   element: DragElement;
@@ -22,7 +20,8 @@ export interface DragSupportProps {
 export default function DragSupport(props: DragSupportProps) {
   const [dragState, setDragState] = useState<DragState | undefined>(undefined);
   const { mutation, setMutation } = useDragMutationStore();
-  const { setContent } = useDocumentStore();
+
+  const view = useActiveView();
 
   useEffect(() => {
     return () => {
@@ -116,11 +115,10 @@ export default function DragSupport(props: DragSupportProps) {
     ) {
       return;
     }
-    backend.cmd.repositionBlock(mutation.sourceId, {
+    view.cmd.repositionBlock(mutation.sourceId, {
       rel_block_id: mutation.targetId,
       position: mutation.targetBorder === Border.Top ? "Top" : "Bottom",
     });
-    setContent(backend.instance.get_content());
   }
 
   const dragOptions: DragContainerOptions<HTMLDivElement> = {

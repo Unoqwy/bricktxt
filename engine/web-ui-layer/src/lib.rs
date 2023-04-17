@@ -4,27 +4,67 @@ use std::collections::HashMap;
 
 use bricktxt_core::engine::Engine;
 use bricktxt_core::rand::randid;
+use bricktxt_core::upstream::{EventEmitter, UpstreamController};
+use bricktxt_core::view::{View, ViewId};
 use datatypes::{
     Block, BlockCreateCommand, BlockDeleteCommand, BlockRepositionCommand,
-    BlockUpdatePropertyCommand,
+    BlockUpdatePropertyCommand, Document,
 };
 
-pub struct Backend {
+pub struct Backend<E>
+where
+    E: EventEmitter,
+{
     engine: Engine,
+
+    // FIXME figure out architecture to have this in engine
+    upstream_controller: UpstreamController<E>,
 }
 
-impl Backend {
-    pub fn init() -> Self {
+impl<E: EventEmitter> Backend<E> {
+    pub fn init(event_emitter: E) -> Self {
         let engine = Engine::init();
-        Self { engine }
+        let upstream_controller = UpstreamController::new(event_emitter);
+        Self {
+            engine,
+            upstream_controller,
+        }
+    }
+
+    fn post_command(&mut self) {
+        for view in self.engine.views.iter() {
+            self.upstream_controller.update_view(view.id);
+        }
     }
 }
 
-impl Backend {
+impl<E: EventEmitter> Backend<E> {
     #[inline]
-    pub fn get_content(&mut self) -> Vec<Block> {
-        let doc = self.engine.editor.registry.all_documents().next().unwrap();
-        doc.blocks(&self.engine.editor.registry)
+    pub fn view_create(&mut self, initial_doc_id: String) -> ViewId {
+        self.engine.view_id_counter += 1;
+        let id = self.engine.view_id_counter;
+        self.engine.views.push(View {
+            id,
+            active_document: initial_doc_id,
+        });
+        id
+    }
+
+    #[inline]
+    pub fn view_free(&mut self, view_id: ViewId) {
+        self.engine.views.retain(|view| view.id == view_id);
+    }
+
+    #[inline]
+    pub fn view_get_content(&mut self, view_id: u32) -> Document {
+        let document = self
+            .engine
+            .get_view(view_id)
+            .map(|view| &view.active_document)
+            .and_then(|doc_id| self.engine.editor.registry.get_document(doc_id))
+            .expect("View bound to inexisting document");
+        let blocks = document
+            .blocks(&self.engine.editor.registry)
             .into_iter()
             .map(|block| Block {
                 id: &block.id,
@@ -35,7 +75,12 @@ impl Backend {
                     .and_then(|val| val.as_str())
                     .unwrap_or(""),
             })
-            .collect()
+            .collect();
+        Document {
+            id: &document.id,
+            title: &document.title,
+            content: blocks,
+        }
     }
 
     #[inline]
@@ -50,11 +95,13 @@ impl Backend {
         };
         self.engine.editor.registry.add_block(block);
         self.engine.editor.move_block(&id, command.placement);
+        self.post_command();
     }
 
     #[inline]
     pub fn cmd_block_delete(&mut self, command: BlockDeleteCommand) {
         self.engine.editor.delete_block(&command.block_id);
+        self.post_command();
     }
 
     #[inline]
@@ -62,6 +109,7 @@ impl Backend {
         self.engine
             .editor
             .move_block(&command.block_id, command.placement);
+        self.post_command();
     }
 
     #[inline]
@@ -71,5 +119,6 @@ impl Backend {
             None => return,
         };
         block.properties.insert(command.property, command.value);
+        self.post_command();
     }
 }

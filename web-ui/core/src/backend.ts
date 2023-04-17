@@ -1,17 +1,16 @@
-import { Backend, BlockPlacement } from "bricktxt-backend-api";
+import { Backend } from "bricktxt-backend-api";
+import { BackendView } from "./view";
 
-class BackendWrapper {
-  /**
-   * Access wrapper methods around backend commands, that
-   * follow Javascript naming conventions.
-   */
-  public readonly cmd: BackendWrapperCommands;
+export class BackendWrapper {
+  static readonly get = new BackendWrapper();
 
   private _instance: Backend | undefined;
 
-  public constructor() {
-    this.cmd = new BackendWrapperCommands(this);
+  private views: Map<number, BackendView>;
+
+  private constructor() {
     this._instance = undefined;
+    this.views = new Map();
   }
 
   public init(instance: Backend) {
@@ -35,44 +34,34 @@ class BackendWrapper {
     }
     return this._instance;
   }
-}
 
-class BackendWrapperCommands {
-  private backend: BackendWrapper;
-
-  public constructor(backend: BackendWrapper) {
-    this.backend = backend;
+  public createView(initialDocId: string): BackendView {
+    const view_id = this.instance.view_create(initialDocId);
+    const view = new BackendView(this, view_id);
+    this.views.set(view.id, view);
+    return view;
   }
 
-  public createBlock(type: string, placement: BlockPlacement) {
-    this.backend.instance.cmd_block_create({
-      type,
-      placement,
-    });
-  }
-
-  public deleteBlock(id: string) {
-    this.backend.instance.cmd_block_delete({
-      block_id: id,
-    });
-  }
-
-  public repositionBlock(id: string, placement: BlockPlacement) {
-    this.backend.instance.cmd_block_reposition({
-      block_id: id,
-      placement,
-    });
-  }
-
-  public updateBlockProperty(id: string, property: string, value: any) {
-    this.backend.instance.cmd_block_update_property({
-      block_id: id,
-      property,
-      value,
-    });
+  /**
+   * Processes an event coming from the backend.
+   *
+   * @param name Event name.
+   * @param payload Event payload.
+   */
+  public handleEvent(name: string, payload: any) {
+    switch (name) {
+      case "update_views":
+        const viewIds = payload as number[];
+        for (const viewId of viewIds) {
+          this.views.get(viewId)?.handleUpdate();
+        }
+        break;
+      case "delete_view":
+        const viewId = payload as number;
+        const view = this.views.get(viewId);
+        view?.markAsDeleted();
+        this.views.delete(viewId);
+        break;
+    }
   }
 }
-
-const backend = new BackendWrapper();
-
-export default backend;

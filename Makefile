@@ -1,5 +1,5 @@
 install:
 	pnpm install
 
-build-web:
+build-wasm:
 	cd engine/web-wasm && wasm-pack build

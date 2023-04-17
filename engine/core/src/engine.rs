@@ -3,6 +3,7 @@ use std::collections::HashMap;
 
 use crate::editor::Editor;
 use crate::rand::randid;
+use crate::view::{View, ViewId};
 
 pub type ExposedId = String;
 
@@ -43,6 +44,9 @@ pub struct Block {
 }
 
 pub struct Engine {
+    pub views: Vec<View>,
+    pub view_id_counter: ViewId,
+
     pub editor: Editor,
 }
 
@@ -50,7 +54,7 @@ impl Engine {
     pub fn init() -> Self {
         let mut registry = Registry::new();
 
-        let doc_id = randid();
+        let doc_id = "test-doc".to_owned();
         let mut doc_content = Vec::new();
         for i in 0..100 {
             let id = randid();
@@ -80,8 +84,14 @@ impl Engine {
         registry.add_document(doc);
 
         Engine {
+            views: Vec::new(),
+            view_id_counter: 0,
             editor: Editor::new(registry),
         }
+    }
+
+    pub fn get_view(&self, id: ViewId) -> Option<&View> {
+        self.views.iter().find(|view| view.id == id)
     }
 }
 

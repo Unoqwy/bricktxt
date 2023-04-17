@@ -1,6 +1,6 @@
-import { BlockActions } from "./BlockActions";
 import { DragPlaceholder } from "~/components/drag/DragPlaceholder";
 import { useMemo, useRef, useState } from "react";
+import { BlockActions } from "./BlockActions";
 
 export interface BlockProps {
   id: string;

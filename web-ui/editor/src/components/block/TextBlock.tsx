@@ -1,9 +1,8 @@
-import { backend } from "bricktxt-core";
+import FloatOverlay from "~/FloatOverlay";
 import styles from "./TextBlock.module.css";
 import { useRef, useState } from "react";
 import ContentEditable from "react-contenteditable";
-import FloatOverlay from "~/FloatOverlay";
-import { useDocumentStore } from "~/store/document";
+import useActiveView from "~/hooks/useActiveView";
 
 export interface TextBlockProps {
   blockId: string;
@@ -15,7 +14,7 @@ export default function TextBlock(props: TextBlockProps) {
   const contentInnerRef = useRef<HTMLDivElement>(null);
 
   const [slashActions, setSlashActions] = useState(false);
-  const { setContent: setDocument } = useDocumentStore();
+  const view = useActiveView();
 
   return (
     <>
@@ -26,11 +25,7 @@ export default function TextBlock(props: TextBlockProps) {
         html={content.current}
         onChange={(event) => {
           content.current = event.target.value;
-          backend.cmd.updateBlockProperty(
-            props.blockId,
-            "text",
-            content.current
-          );
+          view.cmd.updateBlockProperty(props.blockId, "text", content.current);
         }}
         onKeyDown={(event) => {
           if (event.key === "/") {
@@ -38,18 +33,16 @@ export default function TextBlock(props: TextBlockProps) {
             setSlashActions(true);
           } else if (event.key === "Enter") {
             event.preventDefault();
-            backend.cmd.createBlock("default", {
+            view.cmd.createBlock("default", {
               rel_block_id: props.blockId,
               position: "Bottom",
             });
-            setDocument(backend.instance.get_content());
           } else if (
             event.key === "Backspace" &&
             content.current.length === 0
           ) {
             event.preventDefault();
-            backend.cmd.deleteBlock(props.blockId);
-            setDocument(backend.instance.get_content());
+            view.cmd.deleteBlock(props.blockId);
           }
         }}
       />
