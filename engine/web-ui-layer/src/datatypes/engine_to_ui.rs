@@ -9,6 +9,7 @@
 //! In that case, a lifetime `'ui` is used to say the data should only live
 //! until it's serialized to the UI within the same synchronous call.
 
+use bricktxt_core::view::ViewId;
 use serde::Serialize;
 
 #[derive(Clone, Serialize)]
@@ -24,4 +25,10 @@ pub struct Block<'ui> {
     #[serde(rename = "type")]
     pub ty: &'ui str,
     pub text: &'ui str,
+}
+
+#[derive(Clone, Serialize)]
+pub struct FocusRequest {
+    pub view: ViewId,
+    pub block_id: String,
 }

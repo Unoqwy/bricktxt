@@ -1,6 +1,6 @@
 import FloatOverlay from "~/FloatOverlay";
 import styles from "./TextBlock.module.css";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ContentEditable from "react-contenteditable";
 import useActiveView from "~/hooks/useActiveView";
 
@@ -9,12 +9,38 @@ export interface TextBlockProps {
   text: string;
 }
 
+function focusEnd(el: HTMLElement) {
+  const textNode = document.createTextNode("");
+  el.appendChild(textNode);
+  if (textNode !== null && textNode.nodeValue !== null) {
+    const selection = window.getSelection();
+    if (selection !== null) {
+      const range = document.createRange();
+      range.setStart(textNode, textNode.nodeValue.length);
+      range.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+  }
+  // even if text node creation failed, still focus but it will be at the front
+  el.focus();
+}
+
 export default function TextBlock(props: TextBlockProps) {
   const content = useRef(props.text);
   const contentInnerRef = useRef<HTMLDivElement>(null);
 
   const [slashActions, setSlashActions] = useState(false);
   const view = useActiveView();
+
+  useEffect(() => {
+    if (
+      contentInnerRef.current &&
+      view.attemptConsumePendingFocus(props.blockId)
+    ) {
+      focusEnd(contentInnerRef.current);
+    }
+  });
 
   return (
     <>
@@ -33,16 +59,20 @@ export default function TextBlock(props: TextBlockProps) {
             setSlashActions(true);
           } else if (event.key === "Enter") {
             event.preventDefault();
-            view.cmd.createBlock("default", {
-              rel_block_id: props.blockId,
-              position: "Bottom",
-            });
+            view.cmd.createBlock(
+              "default",
+              {
+                rel_block_id: props.blockId,
+                position: "Bottom",
+              },
+              true
+            );
           } else if (
             event.key === "Backspace" &&
             content.current.length === 0
           ) {
             event.preventDefault();
-            view.cmd.deleteBlock(props.blockId);
+            view.cmd.deleteBlock(props.blockId, true);
           }
         }}
       />

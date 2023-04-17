@@ -50,18 +50,26 @@ export class BackendWrapper {
    */
   public handleEvent(name: string, payload: any) {
     switch (name) {
-      case "update_views":
+      case "update_views": {
         const viewIds = payload as number[];
         for (const viewId of viewIds) {
           this.views.get(viewId)?.handleUpdate();
         }
         break;
-      case "delete_view":
+      }
+      case "delete_view": {
         const viewId = payload as number;
         const view = this.views.get(viewId);
         view?.markAsDeleted();
         this.views.delete(viewId);
         break;
+      }
+      case "focus": {
+        const viewId = payload.view as number;
+        const blockId = payload.block_id as string;
+        this.views.get(viewId)?.handleFocusRequest(blockId);
+        break;
+      }
     }
   }
 }

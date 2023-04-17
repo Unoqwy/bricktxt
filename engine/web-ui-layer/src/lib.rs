@@ -8,7 +8,7 @@ use bricktxt_core::upstream::{EventEmitter, UpstreamController};
 use bricktxt_core::view::{View, ViewId};
 use datatypes::{
     Block, BlockCreateCommand, BlockDeleteCommand, BlockRepositionCommand,
-    BlockUpdatePropertyCommand, Document,
+    BlockUpdatePropertyCommand, Document, FocusRequest,
 };
 
 pub struct Backend<E>
@@ -95,12 +95,38 @@ impl<E: EventEmitter> Backend<E> {
         };
         self.engine.editor.registry.add_block(block);
         self.engine.editor.move_block(&id, command.placement);
+        if let Some(view) = command.control_focus {
+            self.upstream_controller
+                .emit_event("focus", FocusRequest { view, block_id: id });
+        }
         self.post_command();
     }
 
     #[inline]
     pub fn cmd_block_delete(&mut self, command: BlockDeleteCommand) {
+        let focus_request = command.control_focus.and_then(|view| {
+            self.engine
+                .editor
+                .query_block_and_parent(
+                    &command.block_id,
+                    |block, parent| {
+                        parent.and_then(|doc| {
+                            doc.child_pos(&block.id)
+                                .filter(|pos| *pos > 0)
+                                .map(|pos| doc.content[pos - 1].clone())
+                        })
+                    },
+                    None,
+                )
+                .map(|focus_block_id| FocusRequest {
+                    view,
+                    block_id: focus_block_id,
+                })
+        });
         self.engine.editor.delete_block(&command.block_id);
+        if let Some(focus_request) = focus_request {
+            self.upstream_controller.emit_event("focus", focus_request);
+        }
         self.post_command();
     }
 

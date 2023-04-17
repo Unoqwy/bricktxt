@@ -23,10 +23,19 @@ impl<E: EventEmitter> UpstreamController<E> {
     pub fn new(event_emitter: E) -> Self {
         Self { event_emitter }
     }
+
+    #[inline]
+    pub fn emit_event<S, T>(&self, event_name: S, payload: T)
+    where
+        S: AsRef<str>,
+        T: Serialize,
+    {
+        self.event_emitter.emit(event_name, payload);
+    }
 }
 
 impl<E: EventEmitter> UpstreamController<E> {
     pub fn update_view(&self, view_id: ViewId) {
-        self.event_emitter.emit("update_views", vec![view_id]);
+        self.emit_event("update_views", vec![view_id]);
     }
 }

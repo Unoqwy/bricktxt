@@ -18,6 +18,21 @@ impl Editor {
 }
 
 impl Editor {
+    pub fn query_block_and_parent<F, R>(&self, block_id: &InternalId, f: F, default: R) -> R
+    where
+        F: FnOnce(&Block, Option<&Document>) -> R,
+    {
+        let block = match self.registry.blocks.get(block_id) {
+            Some(block) => block,
+            None => return default,
+        };
+        let parent = block
+            ._parent
+            .as_ref()
+            .and_then(|doc_id| self.registry.documents.get(doc_id));
+        f(block, parent)
+    }
+
     /// Edit a block and its parent.
     ///
     /// ## Arguments
@@ -32,26 +47,25 @@ impl Editor {
     where
         F: FnOnce(&mut Block, Option<&mut Document>) -> (bool, bool),
     {
-        match self.registry.blocks.get_mut(block_id) {
-            Some(block) => {
-                let mut parent = block
-                    ._parent
-                    .as_ref()
-                    .and_then(|doc_id| self.registry.documents.get_mut(doc_id));
-                let (block_edited, parent_edited) = f(block, parent.as_deref_mut());
-                if block_edited {
-                    block._dirty = true;
-                }
-                match parent {
-                    Some(doc) if parent_edited => {
-                        doc._dirty = true;
-                    }
-                    _ => {}
-                }
-                true
-            }
-            None => false,
+        let block = match self.registry.blocks.get_mut(block_id) {
+            Some(block) => block,
+            None => return false,
+        };
+        let mut parent = block
+            ._parent
+            .as_ref()
+            .and_then(|doc_id| self.registry.documents.get_mut(doc_id));
+        let (block_edited, parent_edited) = f(block, parent.as_deref_mut());
+        if block_edited {
+            block._dirty = true;
         }
+        match parent {
+            Some(doc) if parent_edited => {
+                doc._dirty = true;
+            }
+            _ => {}
+        }
+        true
     }
 
     /// Changes a block's parent, removing it from previous one and adding it to the new one (if any).
@@ -116,7 +130,7 @@ fn orphan_block(block: &Block, reg_documents: &mut HashMap<InternalId, Document>
         .as_ref()
         .and_then(|doc_id| reg_documents.get_mut(doc_id));
     if let Some(parent) = parent {
-        let index = parent.content.iter().position(|child| block.id.eq(child));
+        let index = parent.child_pos(&block.id);
         if let Some(index) = index {
             parent.content.remove(index);
             parent._dirty = true;

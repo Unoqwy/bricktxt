@@ -17,12 +17,13 @@ export class BackendView {
   private _id: number;
   private reactStore: ReactStoreCompat;
 
+  private pendingFocus: string | undefined;
   private _cachedContent: Document | undefined;
 
-  public constructor(backend: BackendWrapper, view_id: number) {
+  public constructor(backend: BackendWrapper, viewId: number) {
     this.backend = backend;
-    this.cmd = new Commands(backend);
-    this._id = view_id;
+    this.cmd = new Commands(backend, viewId);
+    this._id = viewId;
     this.reactStore = new ReactStoreCompat();
   }
 
@@ -47,6 +48,18 @@ export class BackendView {
   public handleUpdate() {
     this._cachedContent = undefined;
     this.reactStore.publishChange();
+  }
+
+  public handleFocusRequest(blockId: string) {
+    this.pendingFocus = blockId;
+  }
+
+  public attemptConsumePendingFocus(blockId: string): boolean {
+    if (this.pendingFocus === blockId) {
+      this.pendingFocus = undefined;
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -96,21 +109,42 @@ class ReactStoreCompat {
 
 class Commands {
   private backend: BackendWrapper;
+  private viewId: number;
 
-  public constructor(backend: BackendWrapper) {
+  public constructor(backend: BackendWrapper, viewId: number) {
     this.backend = backend;
+    this.viewId = viewId;
   }
 
-  public createBlock(type: string, placement: BlockPlacement) {
+  /**
+   * Creates a new block.
+   *
+   * @param type Block type.
+   * @param placement Placement strategy to position the block.
+   * @param controlFocus Whether the newly created block should be focused.
+   */
+  public createBlock(
+    type: string,
+    placement: BlockPlacement,
+    controlFocus: boolean
+  ) {
     this.backend.instance.cmd_block_create({
       type,
       placement,
+      control_focus: controlFocus ? this.viewId : undefined,
     });
   }
 
-  public deleteBlock(id: string) {
+  /**
+   * Deletes a block.
+   *
+   * @param id ID of the block to delete.
+   * @param controlFocus Whether focus should be moved to a near block after deletion.
+   */
+  public deleteBlock(id: string, controlFocus: boolean) {
     this.backend.instance.cmd_block_delete({
       block_id: id,
+      control_focus: controlFocus ? this.viewId : undefined,
     });
   }
 

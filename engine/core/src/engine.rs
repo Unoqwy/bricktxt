@@ -105,6 +105,10 @@ impl Document {
         }
         blocks
     }
+
+    pub fn child_pos(&self, block_id: &InternalId) -> Option<usize> {
+        self.content.iter().position(|child| block_id.eq(child))
+    }
 }
 
 pub struct Registry {

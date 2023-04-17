@@ -1,5 +1,5 @@
 import { DragPlaceholder } from "~/components/drag/DragPlaceholder";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { BlockActions } from "./BlockActions";
 
 export interface BlockProps {
@@ -10,15 +10,19 @@ export interface BlockProps {
 export default function Block(props: BlockProps) {
   const [showActions, setShowActions] = useState(false);
 
-  const ref = useRef(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const content = useMemo(
     () => (
-      <div ref={ref} className="w-full">
+      <div ref={contentRef} className="w-full">
         {props.children}
       </div>
     ),
     [props.children]
   );
+
+  useEffect(() => {
+    contentRef.current?.focus();
+  });
 
   return (
     <div
@@ -28,7 +32,9 @@ export default function Block(props: BlockProps) {
       onMouseLeave={() => setShowActions(false)}
     >
       <div className="absolute left-[-50px] w-[50px] h-full pr-2">
-        {showActions && <BlockActions blockId={props.id} contentRef={ref} />}
+        {showActions && (
+          <BlockActions blockId={props.id} contentRef={contentRef} />
+        )}
       </div>
       {content}
       <DragPlaceholder blockId={props.id} />
