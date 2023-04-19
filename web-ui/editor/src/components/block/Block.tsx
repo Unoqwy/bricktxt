@@ -1,9 +1,11 @@
 import { DragPlaceholder } from "~/components/drag/DragPlaceholder";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BlockActions } from "./BlockActions";
+import classNames from "classnames";
 
 export interface BlockProps {
   id: string;
+  highlight?: string;
   children: React.ReactNode;
 }
 
@@ -26,12 +28,15 @@ export default function Block(props: BlockProps) {
 
   return (
     <div
-      className="flex ml-1 gap-1 relative"
+      className={classNames(
+        "relative px-px py-0.5 rounded-sm",
+        props.highlight
+      )}
       data-block-id={props.id}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
-      <div className="absolute left-[-50px] w-[50px] h-full pr-2">
+      <div className="absolute left-[-50px] w-[50px] h-full pr-1">
         {showActions && (
           <BlockActions blockId={props.id} contentRef={contentRef} />
         )}

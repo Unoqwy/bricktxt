@@ -1,8 +1,8 @@
-import FloatOverlay from "~/FloatOverlay";
 import styles from "./TextBlock.module.css";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import ContentEditable from "react-contenteditable";
-import useActiveView from "~/hooks/useActiveView";
+import useActiveView, { useActiveViewOverlay } from "~/hooks/useActiveView";
+import SlashActions from "./SlashActions";
 
 export interface TextBlockProps {
   blockId: string;
@@ -30,9 +30,8 @@ export default function TextBlock(props: TextBlockProps) {
   const content = useRef(props.text);
   const contentInnerRef = useRef<HTMLDivElement>(null);
 
-  const [slashActions, setSlashActions] = useState(false);
   const view = useActiveView();
-
+  const overlay = useActiveViewOverlay();
   useEffect(() => {
     if (
       contentInnerRef.current &&
@@ -55,8 +54,20 @@ export default function TextBlock(props: TextBlockProps) {
         }}
         onKeyDown={(event) => {
           if (event.key === "/") {
-            event.preventDefault();
-            setSlashActions(true);
+            if (contentInnerRef.current) {
+              const selection = document.getSelection();
+              const range = selection?.getRangeAt(0);
+              if (range === undefined) {
+                return;
+              }
+              var rect = range.getBoundingClientRect();
+              if (rect.x === 0 && rect.y === 0) {
+                rect = contentInnerRef.current.getBoundingClientRect();
+              }
+              overlay.setFloatingNode(
+                <SlashActions posX={rect.x} posY={rect.y + rect.height} />
+              );
+            }
           } else if (event.key === "Enter") {
             event.preventDefault();
             view.cmd.createBlock(
@@ -67,26 +78,17 @@ export default function TextBlock(props: TextBlockProps) {
               },
               true
             );
+            overlay.setFloatingNode(undefined);
           } else if (
             event.key === "Backspace" &&
             content.current.length === 0
           ) {
             event.preventDefault();
             view.cmd.deleteBlock(props.blockId, true);
+            overlay.setFloatingNode(undefined);
           }
         }}
       />
-      {slashActions && (
-        <FloatOverlay
-          relTo={contentInnerRef.current}
-          close={() => setSlashActions(false)}
-        >
-          <div className="bg-neutral-200 p-1 rounded-sm flex flex-col gap-1">
-            <button className="bg-neutral-100 px-2 py-1">Action</button>
-            <button className="bg-neutral-100 px-2 py-1">Test</button>
-          </div>
-        </FloatOverlay>
-      )}
     </>
   );
 }

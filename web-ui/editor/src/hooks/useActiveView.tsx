@@ -15,3 +15,21 @@ export default function useActiveView(): BackendView {
   }
   return view;
 }
+
+export interface ActiveViewOverlay {
+  setFloatingNode(node: React.ReactNode): void;
+}
+
+export const ActiveViewOverlayContext = createContext<
+  ActiveViewOverlay | undefined
+>(undefined);
+
+export function useActiveViewOverlay(): ActiveViewOverlay {
+  const viewOverlay = useContext(ActiveViewOverlayContext);
+  if (viewOverlay === undefined) {
+    throw new Error(
+      "Illegal state: useActiveViewOverlay needs a ActiveViewOverlayContext.Provider in tree"
+    );
+  }
+  return viewOverlay;
+}
