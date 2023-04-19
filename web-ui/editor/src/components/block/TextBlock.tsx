@@ -52,20 +52,25 @@ export default function TextBlock(props: TextBlockProps) {
           content.current = event.target.value;
           view.cmd.updateBlockProperty(props.blockId, "text", content.current);
         }}
+        onBlur={() => overlay.setFloatingNode(undefined)}
         onKeyDown={(event) => {
           if (event.key === "/") {
+            if (event.ctrlKey) {
+              event.preventDefault();
+            }
             if (contentInnerRef.current) {
               const selection = document.getSelection();
               const range = selection?.getRangeAt(0);
               if (range === undefined) {
                 return;
               }
-              var rect = range.getBoundingClientRect();
-              if (rect.x === 0 && rect.y === 0) {
-                rect = contentInnerRef.current.getBoundingClientRect();
-              }
+              const carretX = range.getBoundingClientRect().x;
+              const elRect = contentInnerRef.current.getBoundingClientRect();
               overlay.setFloatingNode(
-                <SlashActions posX={rect.x} posY={rect.y + rect.height} />
+                <SlashActions
+                  posX={carretX > 0 ? carretX : elRect.x}
+                  posY={elRect.y + elRect.height}
+                />
               );
             }
           } else if (event.key === "Enter") {
