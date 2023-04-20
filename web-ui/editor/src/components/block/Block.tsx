@@ -5,7 +5,7 @@ import classNames from "classnames";
 
 export interface BlockProps {
   id: string;
-  highlight?: string;
+  className?: string;
   children: React.ReactNode;
 }
 
@@ -30,7 +30,7 @@ export default function Block(props: BlockProps) {
     <div
       className={classNames(
         "relative px-px py-0.5 rounded-sm",
-        props.highlight
+        props.className
       )}
       data-block-id={props.id}
       onMouseEnter={() => setShowActions(true)}

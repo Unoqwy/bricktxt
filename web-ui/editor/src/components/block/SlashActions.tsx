@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useActiveViewOverlay } from "~/hooks/useActiveView";
 
 import styles from "./SlashActions.module.css";
@@ -24,6 +24,7 @@ export default function SlashActions(props: SlashActionsProps) {
       name: "Heading 3",
     },
   ];
+  const [selected, setSelected] = useState(0);
 
   const overlay = useActiveViewOverlay();
 
@@ -72,10 +73,16 @@ export default function SlashActions(props: SlashActionsProps) {
       <span className="text-sm text-slate-500 w-full text-center">
         Common blocks
       </span>
-      {options.map((option) => (
+      {options.map((option, idx) => (
         <button
           key={option.name}
-          className="hover:bg-slate-100 rounded-sm px-2 py-1 w-full outline-none text-left"
+          onMouseEnter={() => setSelected(idx)}
+          className={classNames(
+            "rounded-sm px-2 py-1 w-full outline-none text-left",
+            {
+              "bg-slate-100": selected === idx,
+            }
+          )}
         >
           {option.name}
         </button>

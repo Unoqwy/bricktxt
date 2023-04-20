@@ -62,9 +62,15 @@ impl Engine {
                 doc_content.push(id.clone());
             }
 
-            let ty = "test".to_owned();
+            let mut ty = "paragraph".to_owned();
+            if i % 60 == 0 {
+                ty = "heading-1".to_owned();
+            }
             let mut properties = HashMap::default();
-            properties.insert("text".to_owned(), toml::Value::String(format!("Hi {}", id)));
+            properties.insert(
+                "text".to_owned(),
+                toml::Value::String(format!("Hi {} ({})", id, &ty)),
+            );
             registry.add_block(Block {
                 id,
                 ty,

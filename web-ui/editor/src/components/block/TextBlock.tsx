@@ -3,8 +3,10 @@ import { useEffect, useRef } from "react";
 import ContentEditable from "react-contenteditable";
 import useActiveView, { useActiveViewOverlay } from "~/hooks/useActiveView";
 import SlashActions from "./SlashActions";
+import classNames from "classnames";
 
 export interface TextBlockProps {
+  className?: string;
   blockId: string;
   text: string;
 }
@@ -44,7 +46,7 @@ export default function TextBlock(props: TextBlockProps) {
   return (
     <>
       <ContentEditable
-        className={styles.content}
+        className={classNames(props.className, styles.content)}
         data-empty-placeholder="Press '/' for commands"
         innerRef={contentInnerRef}
         html={content.current}
@@ -76,7 +78,7 @@ export default function TextBlock(props: TextBlockProps) {
           } else if (event.key === "Enter") {
             event.preventDefault();
             view.cmd.createBlock(
-              "default",
+              "paragraph",
               {
                 rel_block_id: props.blockId,
                 position: "Bottom",
